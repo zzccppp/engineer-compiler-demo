@@ -1,7 +1,7 @@
-use crate::nfa::FANodeType::{Normal, End};
+use crate::nfa::FANodeType::{End, Normal};
 use std::cell::RefCell;
-use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet, VecDeque};
-use std::process::id;
+use std::collections::{HashMap, HashSet, VecDeque};
+
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialOrd, PartialEq)]
@@ -343,9 +343,13 @@ impl DFA {
     pub fn match_str(&self, str: &str) -> bool {
         let mut now_node = self.start_id;
         for c in str.chars() {
-            let find_node = self.nodes.get(&now_node).unwrap().transfers.iter().find(|x| {
-                x.condition == c
-            });
+            let find_node = self
+                .nodes
+                .get(&now_node)
+                .unwrap()
+                .transfers
+                .iter()
+                .find(|x| x.condition == c);
             match find_node {
                 None => {
                     return false;
@@ -393,46 +397,56 @@ pub fn nfa_to_dfa(nfa: &NFA) -> DFA {
     }
 
     let mut nodes = HashMap::<u64, DFANode>::new();
-    nodes.insert(0, DFANode {
-        node_type: FANodeType::Start,
-        id: 0,
-        transfers: vec![],
-    });
+    nodes.insert(
+        0,
+        DFANode {
+            node_type: FANodeType::Start,
+            id: 0,
+            transfers: vec![],
+        },
+    );
     for i in 1..Q.len() {
-        let ty = if Q.get(i).unwrap().iter().any(|x| {
-            nfa.nodes.get(x).unwrap().node_type == End
-        }) {
+        let ty = if Q
+            .get(i)
+            .unwrap()
+            .iter()
+            .any(|x| nfa.nodes.get(x).unwrap().node_type == End)
+        {
             End
         } else {
             Normal
         };
 
-        nodes.insert(i as u64, DFANode {
-            node_type: ty,
-            id: i as u64,
-            transfers: vec![],
-        });
+        nodes.insert(
+            i as u64,
+            DFANode {
+                node_type: ty,
+                id: i as u64,
+                transfers: vec![],
+            },
+        );
     }
 
     for ((k, c), v) in form {
         if let None = v {
             continue;
         } else {
-            nodes.get_mut(&(k as u64)).unwrap().transfers.push(DFATransferInfo {
-                from_id: k as u64,
-                to_id: v.unwrap() as u64,
-                condition: c,
-            });
+            nodes
+                .get_mut(&(k as u64))
+                .unwrap()
+                .transfers
+                .push(DFATransferInfo {
+                    from_id: k as u64,
+                    to_id: v.unwrap() as u64,
+                    condition: c,
+                });
         }
     }
 
     // println!("{:?}", Q);
     // println!("{:?}", form);
 
-    let dfa = DFA {
-        nodes,
-        start_id: 0,
-    };
+    let dfa = DFA { nodes, start_id: 0 };
 
     println!("{:?}", dfa);
 

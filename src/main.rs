@@ -1,11 +1,9 @@
 use engineer_compiler_demo1::nfa::{
     epsilon_closure, epsilon_closure_dfs_delta, nfa_to_dfa, NFAIdAllocator, NFA,
 };
-use std::borrow::BorrowMut;
+
 use std::cell::RefCell;
-use std::collections::HashSet;
-use std::ops::Deref;
-use std::process::id;
+
 use std::rc::Rc;
 
 fn main() {
