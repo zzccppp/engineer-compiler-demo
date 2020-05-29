@@ -9,13 +9,7 @@ use std::process::id;
 use std::rc::Rc;
 
 fn main() {
-    // let s = String::from("1231你好23123");
-    // let mut cs = s.chars();
-    // for x in cs {
-    //     println!("{}", x);
-    // }
-
-    let mut id_alloc = Rc::new(RefCell::new(NFAIdAllocator::default()));
+    let id_alloc = Rc::new(RefCell::new(NFAIdAllocator::default()));
 
     let mut temp = NFA::new_nfa_single_character(&id_alloc, 'b')
         .or(NFA::new_nfa_single_character(&id_alloc, 'c'))
